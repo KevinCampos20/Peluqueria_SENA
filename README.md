@@ -1,1 +1,1 @@
-# Peluqueria_SENA
+Proyecto Peluquería
