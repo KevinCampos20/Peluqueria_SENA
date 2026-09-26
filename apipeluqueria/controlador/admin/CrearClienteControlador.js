@@ -1,5 +1,5 @@
 const modelo = require('../../modelo/admin/CrearClienteModelo');
-
+const bcrypt = require('bcrypt');
 class CrearClienteControlador {     // funcion crear nuevo cliente
 
   static async crearCliente(req, res) {
@@ -146,6 +146,53 @@ class CrearClienteControlador {     // funcion crear nuevo cliente
     }
   }
   //👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊
+  // Función para iniciar sesión como cliente
+  static async loginCliente(req, res) {
+    const { email, contras } = req.body;
+
+    if (!email || !contras) {
+      return res.status(400).json({
+        error: 'El correo y la contraseña son obligatorios.'
+      });
+    }
+
+    try {
+      const resultado = await modelo.buscarClientePorCorreo(email);
+
+      if (resultado.length === 0) {
+        return res.status(401).json({
+          error: 'Correo o contraseña incorrectos.'
+        });
+      }
+
+      const cliente = resultado[0];
+
+      const contraseñaCorrecta = await bcrypt.compare(
+        contras,
+        cliente.contrasena
+      );
+
+      if (!contraseñaCorrecta) {
+        return res.status(401).json({
+          error: 'Correo o contraseña incorrectos.'
+        });
+      }
+
+      return res.status(200).json({
+        mensaje: 'Inicio de sesión exitoso',
+        cliente: {
+          id: cliente.idcliente,
+          nombres: cliente.nombres,
+          correo: cliente.correo
+        }
+      });
+
+    } catch (err) {
+      return res.status(500).json({
+        error: 'Error al iniciar sesión: ' + err.message
+      });
+    }
+  }
 }
 
 module.exports = CrearClienteControlador;
