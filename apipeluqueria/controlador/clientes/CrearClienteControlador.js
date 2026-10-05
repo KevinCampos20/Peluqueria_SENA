@@ -1,4 +1,4 @@
-const modelo = require('../../modelo/clientes/CrearClienteModelo');
+const modelo = require('../../modelo/admin/CrearClienteModelo');
 const bcrypt = require('bcrypt');
 class CrearClienteControlador {     // funcion crear nuevo cliente
 

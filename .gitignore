@@ -1,0 +1,22 @@
+# Dependencias (se reinstalan con: npm install)
+node_modules/
+
+# Variables de entorno (contraseñas y datos sensibles)
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores / IDEs
+.vscode/
+.idea/
+
+# Archivos temporales de Office (cuando Word/Excel están abiertos)
+~$*
