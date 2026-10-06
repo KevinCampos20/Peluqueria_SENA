@@ -6,8 +6,19 @@ class ConsultarHorariosTrabajadorControlador {
 
         try {
             const { idtrabajador } = req.params;
+
+            if (!/^\d+$/.test(idtrabajador)) {
+                return res.status(400).json({ error: 'El id del trabajador debe ser numérico' });
+            }
             
-            const horarios = await modelo.consultarHorarios();
+            const horarios = await modelo.consultarHorarios(idtrabajador);
+
+            if (horarios.length === 0) {
+                return res.json({
+                    mensaje: 'No tiene un horario asignado actualmente.',
+                    horarios: []
+                });
+            }
 
             res.json({
                 mensaje: 'Horarios consultados correctamente',
