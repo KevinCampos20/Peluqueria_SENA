@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administrador</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f7f6; }
+        .dashboard { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        button { padding: 10px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <!-- Aquí mostraremos el nombre del usuario dinámicamente -->
+        <h1 id="bienvenida">Cargando...</h1>
+        <p>Bienvenido al panel de control de la peluquería. Desde aquí podrás gestionar trabajadores, clientes y horarios.</p>
+        
+        <button id="btnCerrarSesion">Cerrar Sesión</button>
+    </div>
+
+    <script>
+        // 1. Leer los datos del usuario guardados durante el login
+        const usuarioGuardado = localStorage.getItem('usuarioPeluqueria');
+
+        // 2. Si no hay datos (alguien intentó entrar por la URL sin loguearse), lo devolvemos al login
+        if (!usuarioGuardado) {
+            window.location.href = '../index.html';
+        } else {
+            // Convertimos el texto JSON a un objeto de JavaScript
+            const usuario = JSON.parse(usuarioGuardado);
+            
+            // Mostramos su nombre en el h1
+            document.getElementById('bienvenida').textContent = `¡Hola, ${usuario.nombres}!`;
+        }
+
+        // 3. Lógica para el botón de cerrar sesión
+        document.getElementById('btnCerrarSesion').addEventListener('click', () => {
+            localStorage.removeItem('usuarioPeluqueria'); // Borramos los datos
+            window.location.href = '../index.html'; // Lo devolvemos al login
+        });
+    </script>
+</body>
+</html>

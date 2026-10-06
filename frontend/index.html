@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Peluquería</title>
+    <!-- Aquí enlazamos tu archivo de estilos -->
+    <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Iniciar Sesión</h2>
+        
+        <!-- El id="loginForm" es clave para capturarlo luego con JavaScript -->
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="correo">Correo Electrónico:</label>
+                <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="contrasena">Contraseña:</label>
+                <input type="password" id="contrasena" name="contrasena" placeholder="Tu contraseña" required>
+            </div>
+
+            <button type="submit" id="btnIngresar">Ingresar</button>
+        </form>
+
+        <!-- Aquí mostraremos mensajes de error si las credenciales fallan -->
+        <p id="mensajeRespuesta" style="color: red; text-align: center; margin-top: 10px;"></p>
+    </div>
+
+    <!-- Aquí enlazamos tu archivo JavaScript al final del body -->
+    <script src="js/main.js"></script>
+</body>
+</html>
