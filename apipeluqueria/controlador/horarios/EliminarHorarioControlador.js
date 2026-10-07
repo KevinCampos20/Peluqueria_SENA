@@ -8,6 +8,17 @@ class EliminarHorarioControlador {
 
             const { idhorario } = req.params;
 
+            // No se elimina si tiene citas asociadas
+            const totalCitas = await modelo.contarCitas(idhorario);
+
+            if (totalCitas > 0) {
+
+                return res.status(409).json({
+                    mensaje: 'El horario tiene citas registradas y no se puede eliminar'
+                });
+
+            }
+
             const resultado = await modelo.eliminarHorario(idhorario);
 
             if (resultado.affectedRows === 0) {

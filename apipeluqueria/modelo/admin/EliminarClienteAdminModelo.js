@@ -19,6 +19,23 @@ class EliminarClienteAdminModelo {
         }
     }
 
+    // Cuenta las citas del cliente (de cualquier estado: la llave foránea las bloquea todas)
+    static async contarCitas(idcliente) {
+
+        const query = `
+            SELECT COUNT(*) AS total
+            FROM citas
+            WHERE idcliente = ?
+        `;
+
+        try {
+            const resultado = await dbService.query(query, [idcliente]);
+            return resultado[0].total;
+        } catch (err) {
+            throw new Error(`Error al consultar las citas del cliente: ${err.message}`);
+        }
+    }
+
     // Elimina el cliente
     static async eliminarCliente(idcliente) {
 

@@ -1,63 +1,36 @@
+// Login: prueba primero personal (trabajador/admin) y luego cliente
 document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('loginForm');
-    const mensajeRespuesta = document.getElementById('mensajeRespuesta');
+  const u = Sesion.usuario();
+  if (u) { location.replace(`vistas/${Sesion.rol(u)}.html`); return; }
 
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Evita que la página se recargue
+  const form = document.getElementById('loginForm');
+  const aviso = document.getElementById('mensajeRespuesta');
+  const boton = document.getElementById('btnIngresar');
+  const clave = document.getElementById('contrasena');
+  const ver = document.getElementById('verClave');
+  const msg = (t, tipo) => { aviso.textContent = t; aviso.className = 'aviso ' + tipo; };
 
-        // Limpiamos cualquier mensaje anterior y mostramos estado de carga
-        mensajeRespuesta.textContent = "Validando credenciales...";
-        mensajeRespuesta.style.color = "blue";
+  ver.addEventListener('click', () => {
+    const oculta = clave.type === 'password';
+    clave.type = oculta ? 'text' : 'password';
+    ver.textContent = oculta ? 'Ocultar' : 'Mostrar';
+    ver.setAttribute('aria-pressed', oculta);
+  });
 
-        // Capturamos los valores que el usuario escribió en las cajas de texto
-        const correo = document.getElementById('correo').value;
-        const contrasena = document.getElementById('contrasena').value;
-
-        try {
-            // Hacemos la petición POST a tu backend
-            const respuesta = await fetch('http://localhost:5020/seguridad/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                // Enviamos los datos como t1 y t2 porque así los exige tu controlador LoginAdminControlador
-                body: JSON.stringify({ t1: correo, t2: contrasena })
-            });
-
-            // Convertimos la respuesta del servidor a formato JSON
-            const datos = await respuesta.json();
-
-            // Si la respuesta es exitosa (código 200 OK)
-            if (respuesta.ok) {
-                mensajeRespuesta.style.color = "green";
-                mensajeRespuesta.textContent = "¡Inicio de sesión exitoso! Redirigiendo...";
-                
-                // 1. Guardar los datos del usuario en el navegador para usarlos en otras pantallas
-                localStorage.setItem('usuarioPeluqueria', JSON.stringify(datos.usuario));
-
-                // 2. Redirigir a la pantalla correspondiente según el rol que nos dio la base de datos
-                setTimeout(() => {
-                    if (datos.usuario.rol === 'admin') {
-                        window.location.href = 'vistas/admin.html';
-                    } else if (datos.usuario.rol === 'trabajador') {
-                        window.location.href = 'vistas/trabajador.html';
-                    } else {
-                        window.location.href = 'vistas/cliente.html'; // Por defecto, si es cliente
-                    }
-                }, 1500); // Espera 1.5 segundos para que el usuario lea el mensaje verde
-            
-            } else {
-                // Si el backend devuelve un error (ej. credenciales incorrectas o falta de permisos)
-                mensajeRespuesta.style.color = "red";
-                // Mostramos el error exacto que enviaste desde tu res.status().json({ error: ... })
-                mensajeRespuesta.textContent = datos.error || "Error al iniciar sesión.";
-            }
-
-        } catch (error) {
-            // Si el servidor Node.js está apagado o hay un problema de red
-            console.error("Error de conexión:", error);
-            mensajeRespuesta.style.color = "red";
-            mensajeRespuesta.textContent = "Error al conectar con el servidor. Verifica que tu backend esté corriendo.";
-        }
-    });
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    boton.disabled = true; msg('Validando credenciales…', 'cargando');
+    const body = { t1: document.getElementById('correo').value.trim(), t2: clave.value };
+    try {
+      let r = await api('/trabajador/login', { method: 'POST', body });
+      if (r.status === 401) r = await api('/login', { method: 'POST', body });
+      if (!r.ok) { msg(r.datos.error || 'No se pudo iniciar sesión.', 'error'); boton.disabled = false; return; }
+      Sesion.guardar(r.datos.usuario);
+      msg('Bienvenido. Entrando…', 'ok');
+      location.href = `vistas/${Sesion.rol(r.datos.usuario)}.html`;
+    } catch {
+      msg('No hay conexión con el servidor. Verifica que el backend esté encendido.', 'error');
+      boton.disabled = false;
+    }
+  });
 });

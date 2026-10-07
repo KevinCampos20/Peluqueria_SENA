@@ -1,77 +1,44 @@
-/* Reset básico para que se vea igual en todos los navegadores */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Fondo de la pantalla y centrado de la tarjeta */
-body {
-    background-color: #f4f7f6;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-/* Estilo de la tarjeta de Login */
-.login-container {
-    background-color: #ffffff;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px; /* Evita que se estire demasiado en pantallas grandes */
-}
-
-.login-container h2 {
-    text-align: center;
-    margin-bottom: 25px;
-    color: #333;
-}
-
-/* Espaciado entre los campos */
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
-    font-weight: 500;
-}
-
-/* Estilo de las cajas de texto */
-.form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    outline: none;
-    transition: border-color 0.3s;
-}
-
-/* Efecto cuando el usuario hace clic en la caja de texto */
-.form-group input:focus {
-    border-color: #007bff;
-}
-
-/* Estilo del botón */
-button {
-    width: 100%;
-    padding: 12px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 15px;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
+:root{--tinta:#2a1838;--ciruela:#4a2a63;--laton:#d9a21b;--fondo:#efecf4;--papel:#fff;--linea:#d9d3e3;--texto:#241a2e;--suave:#655b72;--ok:#1b6e53;--err:#b3261e}
+*{box-sizing:border-box;margin:0}
+body{font:16px/1.5 'Bricolage Grotesque',system-ui,sans-serif;background:var(--fondo);color:var(--texto);min-height:100vh}
+:focus-visible{outline:3px solid var(--laton);outline-offset:2px}
+button,input{font:inherit}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:.7rem 1.2rem;border:0;border-radius:6px;background:var(--ciruela);color:#fff;font-weight:600;cursor:pointer;transition:background .2s}
+.btn:hover{background:var(--tinta)}.btn:disabled{opacity:.6;cursor:wait}
+.btn.sec{background:transparent;color:var(--ciruela);border:1px solid var(--ciruela)}
+.btn.sec:hover{background:var(--ciruela);color:#fff}
+/* Acceso */
+.acceso{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+.letrero{background:var(--tinta);color:#fff;padding:3rem;display:flex;flex-direction:column;justify-content:flex-end;gap:1rem}
+.letrero h1{font-size:clamp(3rem,7vw,5.5rem);line-height:.95;font-weight:800;letter-spacing:-.03em}
+.letrero p{max-width:26ch;color:#cdbfe0;border-left:4px solid var(--laton);padding-left:1rem}
+.formulario{display:grid;place-items:center;padding:2rem}
+.formulario form{width:100%;max-width:23rem}
+.formulario h2{font-size:1.6rem;margin-bottom:.25rem}
+.formulario .sub{color:var(--suave);margin-bottom:1.5rem}
+.campo{margin-bottom:1rem}
+.campo label{display:block;font-weight:600;margin-bottom:.3rem}
+.campo input{width:100%;padding:.7rem .8rem;border:1px solid var(--linea);border-radius:6px;background:var(--papel)}
+.campo input:focus{border-color:var(--ciruela)}
+.clave{position:relative}.clave input{padding-right:5.5rem}
+.clave button{position:absolute;right:.4rem;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--ciruela);font-weight:600;cursor:pointer;padding:.4rem .6rem}
+.formulario .btn{width:100%;margin-top:.5rem}
+.aviso{min-height:1.5rem;margin-top:1rem;font-weight:500}
+.aviso.error{color:var(--err)}.aviso.ok{color:var(--ok)}.aviso.cargando{color:var(--suave)}
+/* Paneles */
+.barra{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem clamp(1rem,4vw,3rem);background:var(--tinta);color:#fff}
+.barra strong{font-size:1.15rem}
+.rol{margin-left:.75rem;padding:.15rem .6rem;border-radius:99px;background:var(--laton);color:var(--tinta);font-size:.85rem;font-weight:600}
+.barra .btn.sec{color:#fff;border-color:#fff}.barra .btn.sec:hover{background:#fff;color:var(--tinta)}
+.agenda{max-width:52rem;margin:0 auto;padding:2rem clamp(1rem,4vw,2rem) 4rem}
+.agenda>h1{font-size:1.8rem}.agenda>.sub{color:var(--suave);margin-bottom:2rem}
+.dia{margin-bottom:2rem}
+.dia h2{font-size:1.05rem;text-transform:capitalize;padding-bottom:.4rem;border-bottom:2px solid var(--ciruela);margin-bottom:.25rem}
+.turno{display:grid;grid-template-columns:8.5rem 1fr auto;align-items:center;gap:1rem;padding:.9rem 0;border-bottom:1px solid var(--linea)}
+.hora{font-size:1.6rem;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.hora small{display:block;font-size:.85rem;font-weight:400;color:var(--suave)}
+.estado{padding:.2rem .7rem;border-radius:99px;font-size:.85rem;font-weight:600;background:#e4dcee;color:var(--ciruela)}
+.estado.disponible{background:#d6efe5;color:var(--ok)}
+.vacio,.fallo{padding:2rem;background:var(--papel);border:1px dashed var(--linea);border-radius:8px;text-align:center}
+.fallo{border-color:var(--err)}.fallo .btn{margin-top:1rem}
+@media(max-width:760px){.acceso{grid-template-columns:1fr}.letrero{padding:2rem 1.5rem;min-height:12rem}.turno{grid-template-columns:6.5rem 1fr}.turno .estado{grid-column:2;justify-self:start}}

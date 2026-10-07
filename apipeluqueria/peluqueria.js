@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const rutaadmin = require('./vista/admin/RutasAdmin');
@@ -10,6 +12,9 @@ const rutacitas = require('./vista/citas/RutasCitas');
 
 const app = express();
 const PORT = process.env.PORT || 3333;
+if (!process.env.PORT) {
+  console.warn('⚠️  PORT no está definido en .env, usando 3333');
+}
 
 // ---------- Middlewares ----------
 app.use(cors({

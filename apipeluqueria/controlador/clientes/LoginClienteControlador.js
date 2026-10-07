@@ -1,5 +1,5 @@
 /*
-1. este es rf-03 login cliente funcion validarCredencial
+Este es rf-03 login cliente funcion validarCredencial
 */
 
 const modelo = require('../../modelo/clientes/LoginClienteModelo');
@@ -19,6 +19,10 @@ class LoginClienteControlador {
       
       if (!user) {
         return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
+      }
+
+      if (user.estado !== 'Activo') {
+        return res.status(403).json({ error: 'La cuenta está inactiva. Comuníquese con el administrador.' });
       }
 
       const { contrasena, ...usuarioSinClave } = user;

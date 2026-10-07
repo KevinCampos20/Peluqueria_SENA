@@ -22,7 +22,16 @@ class EliminarClienteAdminControlador {
                 return res.status(404).json({ error: 'No se encontró ningún cliente con esos datos.' });
             }
 
-            // 3. Eliminar (CA-06)
+            // 3. No se elimina si tiene citas registradas
+            const totalCitas = await modelo.contarCitas(idcliente);
+
+            if (totalCitas > 0) {
+                return res.status(409).json({
+                    error: 'El cliente tiene citas registradas y no se puede eliminar. Puede desactivar su cuenta.'
+                });
+            }
+
+            // 4. Eliminar (CA-06)
             await modelo.eliminarCliente(idcliente);
 
             return res.json({ mensaje: 'El cliente fue eliminado correctamente.' });

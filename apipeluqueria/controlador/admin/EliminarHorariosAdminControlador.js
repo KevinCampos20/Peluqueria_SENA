@@ -22,7 +22,16 @@ class EliminarHorariosAdminControlador {
                 return res.status(404).json({ error: 'El horario no está disponible o ya fue eliminado.' });
             }
 
-            // 3. Eliminar
+            // 3. No se elimina si tiene citas asociadas
+            const totalCitas = await modelo.contarCitas(idhorario);
+
+            if (totalCitas > 0) {
+                return res.status(409).json({
+                    error: 'El horario tiene citas registradas y no se puede eliminar.'
+                });
+            }
+
+            // 4. Eliminar
             await modelo.eliminarHorario(idhorario);
 
             return res.json({ mensaje: 'Horario eliminado correctamente.' });

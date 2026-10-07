@@ -1,5 +1,5 @@
 /*
-1. este es rf-03 login admin funcion validarCredencial
+Este es rf-03 login admin funcion validarCredencial
 */
 const modelo = require('../../modelo/admin/LoginAdminModelo');
 
@@ -18,6 +18,10 @@ class LoginAdminControlador {
       
       if (!user) {
         return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
+      }
+
+      if (user.estado !== 'Activo') {
+        return res.status(403).json({ error: 'La cuenta está inactiva. Comuníquese con el administrador.' });
       }
 
       if (user.rol !== 'admin') {

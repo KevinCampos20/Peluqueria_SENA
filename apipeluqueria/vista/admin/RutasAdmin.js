@@ -14,6 +14,7 @@ const ATRutas = require('../../controlador/admin/ActivarTrabajadorControlador');
 const ACRutas = require('../../controlador/admin/ActivarClienteControlador');
 const MARutas = require('../../controlador/admin/DesactivarAdminControlador');
 const AARutas = require('../../controlador/admin/ActivarAdminControlador');
+const EARutas = require('../../controlador/admin/EliminarAdminControlador');
 
 const router = express.Router();
 
@@ -33,5 +34,6 @@ router.put('/seguridad/activartrabajador/:id', ATRutas.modificarestado);
 router.put('/seguridad/activarcliente/:id', ACRutas.modificarestado);
 router.put('/seguridad/desactivaradmin/:id', MARutas.modificarestado);
 router.put('/seguridad/activaradmin/:id', AARutas.modificarestado);
+router.delete('/seguridad/admins/:idadmin', EARutas.eliminarAdmin);//RF25
 
 module.exports = router;

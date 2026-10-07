@@ -19,6 +19,23 @@ class EliminarHorariosAdminModelo {
         }
     }
 
+    // Cuenta las citas asociadas al horario (de cualquier estado)
+    static async contarCitas(idhorario) {
+
+        const query = `
+            SELECT COUNT(*) AS total
+            FROM citas
+            WHERE idhorario = ?
+        `;
+
+        try {
+            const resultado = await dbService.query(query, [idhorario]);
+            return resultado[0].total;
+        } catch (err) {
+            throw new Error(`Error al consultar las citas del horario: ${err.message}`);
+        }
+    }
+
     // Elimina el horario
     static async eliminarHorario(idhorario) {
 
