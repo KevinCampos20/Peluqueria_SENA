@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 07-10-2026 a las 23:12:04
+-- Tiempo de generación: 09-10-2026 a las 16:52:20
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -68,7 +68,9 @@ CREATE TABLE `clientes` (
 INSERT INTO `clientes` (`idcliente`, `tipoDocumento`, `numeroDocumento`, `nombres`, `direccion`, `telefono`, `correo`, `contrasena`, `estado`) VALUES
 (1, 'CC', '12345678', 'Juan Perez', 'Calle 10 # 20-30', '3001234567', 'juan123@gmail.com', '$2b$10$NZPHD1IVzhvm.QTMABpfJ.CHLu33OvLPC8jheSSuv05jDVHvaWWtC', 'Activo'),
 (2, 'CE', '25865254', 'David Tellez', 'cal 1 # 2 4', '3131234569', 'Elmejor@gmail.com', '$2b$10$.8C.0PIUl/W3QHx97BXMlefC6hZXubO5jLyxS6knAKq60VFu0/ORK', 'Activo'),
-(10, 'CC', '33333333', 'Cliente Prueba', 'Calle 30 # 30-30', '3030303030', 'cliente@gmail.com', '$2b$10$oUu1NdiM5zbKyHqBzhj43e.S4Gw1V0z3FnTkIOehj9m5Tr.gKTb.a', 'Activo');
+(10, 'CC', '33333333', 'Cliente Prueba', 'Calle 30 # 30-30', '3030303030', 'cliente@gmail.com', '$2b$10$oUu1NdiM5zbKyHqBzhj43e.S4Gw1V0z3FnTkIOehj9m5Tr.gKTb.a', 'Activo'),
+(12, 'CC', '33333335', 'Cliente Nuevo', 'Calle 30 # 30-38', '3030303035', 'cliente6@gmail.com', '$2b$10$7mmAE9IAvaS3Pvx8FEA2VemCqaOKa5MsR1bRysfYNSxN0creB0Ugu', 'Activo'),
+(14, 'CC', '33333355', 'Cliente Pruebo', 'Calle 30 # 30-38', '3030303035', 'cliente67@gmail.com', '$2b$10$SOnxZIIjI9TE10fcrj8DCOTsxNg2eXIfnMKQz8LIpCFF/Ib/swK7q', 'Inactivo');
 
 -- --------------------------------------------------------
 
@@ -122,7 +124,8 @@ INSERT INTO `trabajadores` (`idtrabajador`, `tipoDocumento`, `numeroDocumento`, 
 (1, 'CC', '1098765433', 'Pedro Trabajador', 'Calle 15 # 20-30', '3001234568', 'pedrotrabajador@gmail.com', '$2b$10$UpFxhnRGoeYF7L0OOWvr1.lNEHcDVds8Bg1tYJvkprcfKnjKll1XC', 'trabajador', 'Activo'),
 (2, 'CC', '1098765434', 'Maria Gomez', 'Carrera 5 # 10-20', '3001234570', 'mariagomez@gmail.com', '$2b$10$UpFxhnRGoeYF7L0OOWvr1.lNEHcDVds8Bg1tYJvkprcfKnjKll1XC', 'trabajador', 'Activo'),
 (3, 'CC', '1070971265', 'Guillermo Ortiz', 'cal 1 # 2 3', '3131234567', '123@gmail.com', '$2b$10$ZSP8AO5tx.qz06011YBoE..tye1.OrFdHfYx03WFR5E5RKU6/8ccS', 'trabajador', 'Activo'),
-(4, 'CC', '1111111111', 'Pepito Perez', 'cal 1 # 2 4', '3131234568', 'pepito@gmail.com', '$2b$10$UpFxhnRGoeYF7L0OOWvr1.lNEHcDVds8Bg1tYJvkprcfKnjKll1XC', 'admin', 'Activo');
+(4, 'CC', '1111111111', 'Pepito Perez', 'cal 1 # 2 4', '3131234568', 'pepito@gmail.com', '$2b$10$UpFxhnRGoeYF7L0OOWvr1.lNEHcDVds8Bg1tYJvkprcfKnjKll1XC', 'admin', 'Activo'),
+(11, 'CC', '55555555', 'Admin Prueba', 'Calle 50 # 50-50', '5050505050', 'admin@gmail.com', '$2b$10$Fx9Vo94gmZzsU/kjmScrCOJ3vY/U4fsL4ceB2mnK8oxQKYESTNwnC', 'admin', 'Activo');
 
 --
 -- Índices para tablas volcadas

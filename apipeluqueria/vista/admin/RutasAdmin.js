@@ -21,11 +21,14 @@ const router = express.Router();
 router.post('/seguridad/crearcliente', CRutas.crearCliente);//RF01
 router.post('/seguridad/creartrabajador', TRutas.crearTrabajador);//RF04
 router.post('/seguridad/crearadmin', ARutas.crearAdmin);
-router.post('/seguridad/login', LRutas.validarCredencial);
+router.get('/seguridad/login', LRutas.validarCredencial);
+
 router.get('/seguridad/horarios', HRutas.consultarHorarios);
 router.get('/seguridad/horarios/:idtrabajador', HRutas.consultarHorariosTrabajador);
+
 router.put('/seguridad/horarios/:idhorario', EHARutas.editarHorario);//RF11
 router.delete('/seguridad/horarios/:idhorario', EHRutas.eliminarHorario);//RF12
+
 router.delete('/seguridad/trabajadores/:idtrabajador', ETRutas.eliminarTrabajador);//RF13
 router.delete('/seguridad/clientes/:idcliente', ECRutas.eliminarCliente);//RF14
 router.put('/seguridad/desactivarcliente/:id', MCRutas.modificarestado);
