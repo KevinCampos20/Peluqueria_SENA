@@ -2,7 +2,7 @@
 Este es rf-03 login trabajador funcion validarCredencial
 */
 
-const modelo = require('../../modelo/Trabajadores/LoginTrabajadorModelo');
+const modelo = require('../../modelo/trabajadores/LoginTrabajadorModelo');
 
 class LoginTrabajadorControlador {
   // Validar correo y contraseña
