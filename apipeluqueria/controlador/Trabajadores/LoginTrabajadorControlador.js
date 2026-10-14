@@ -7,7 +7,7 @@ const modelo = require('../../modelo/trabajadores/LoginTrabajadorModelo');
 class LoginTrabajadorControlador {
   // Validar correo y contraseña
   static async validarCredencial(req, res) {
-    const { correo: email, contrasena: password } = req.body; // Renombramos t1 y t2 para mayor claridad
+    const { t1: email, t2: password } = req.body; // Renombramos t1 y t2 para mayor claridad
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Correo y contraseña son obligatorios' });

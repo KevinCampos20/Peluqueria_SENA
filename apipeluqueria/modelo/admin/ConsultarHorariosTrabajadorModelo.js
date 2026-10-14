@@ -2,55 +2,29 @@ const dbService = require('../bd/Conexion');
 
 class ConsultarHorariosAdminModelo {
 
-    // Consultar todos los horarios
-    static async consultarHorarios() {
-
-        const query = `
-            SELECT 
-                h.idhorario,
-                h.idtrabajador,
-                t.nombres AS trabajador,
-                h.fecha,
-                h.horaInicio,
-                h.horaFin,
-                h.estado
-            FROM horarios h
-            INNER JOIN trabajadores t 
-                ON h.idtrabajador = t.idtrabajador
-            ORDER BY h.fecha, h.horaInicio
-        `;
-
-        try {
-            const resultado = await dbService.query(query);
-            return resultado;
-        } catch (err) {
-            throw new Error(`Error al consultar los horarios: ${err.message}`);
-        }
-    }
-
-
     // Consultar horarios de un trabajador específico
     static async consultarHorariosTrabajador(idtrabajador) {
 
         const query = `
             SELECT 
                 h.idhorario,
-                h.idtrabajador,
+                rh.idtrabajador,
                 t.nombres AS trabajador,
                 h.fecha,
                 h.horaInicio,
-                h.horaFin,
-                h.estado
-            FROM horarios h
+                h.horaFinal AS horaFinal,
+                rh.estado
+            FROM reghorarios rh
+            INNER JOIN horarios h
+                ON rh.idhorario = h.idhorario
             INNER JOIN trabajadores t 
-                ON h.idtrabajador = t.idtrabajador
-            WHERE h.idtrabajador = ?
-            ORDER BY h.fecha, h.horaInicio
+                ON rh.idtrabajador = t.idTrabajador
+            WHERE rh.idTrabajador = ?
+            ORDER BY h.fecha, h.idHorario
         `;
 
         try {
-            const resultado = await dbService.query(query, [idtrabajador]);
-            return resultado;
+            return await dbService.query(query, [idtrabajador]);
         } catch (err) {
             throw new Error(`Error al consultar los horarios del trabajador: ${err.message}`);
         }

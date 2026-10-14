@@ -1,17 +1,25 @@
 // Panel común a los tres roles; cada uno cambia solo qué endpoint consulta
 const ROLES = {
-  admin: { etiqueta: 'Administración', titulo: 'Todos los horarios', sub: 'Horarios registrados de todo el equipo.',
-    url: () => '/seguridad/horarios', vacio: 'Aún no hay horarios registrados.', mostrarTrabajador: true },
-  trabajador: { etiqueta: 'Equipo', titulo: 'Tu agenda', sub: 'Tus turnos y si ya fueron reservados.',
-    url: u => `/trabajador/horarios/${u.idtrabajador}`, vacio: 'Todavía no tienes horarios asignados.', mostrarTrabajador: false },
-  cliente: { etiqueta: 'Cliente', titulo: 'Horarios disponibles', sub: 'Turnos libres para tu próxima cita.',
-    url: () => '/horarios', vacio: 'No hay horarios disponibles por ahora. Vuelve a revisar más tarde.', mostrarTrabajador: true }
+  admin: {
+    etiqueta: 'Administración', titulo: 'Todos los horarios', sub: 'Horarios registrados de todo el equipo.',
+    url: () => '/seguridad/horarios', vacio: 'Aún no hay horarios registrados.', mostrarTrabajador: true
+  },
+  trabajador: {
+    etiqueta: 'Equipo', titulo: 'Tu agenda', sub: 'Tus turnos y si ya fueron reservados.',
+    url: u => `/trabajador/horarios/${u.idtrabajador}`, vacio: 'Todavía no tienes horarios asignados.', mostrarTrabajador: false
+  },
+  cliente: {
+    etiqueta: 'Cliente', titulo: 'Horarios disponibles', sub: 'Turnos libres para tu próxima cita.',
+    url: () => '/horarios', vacio: 'No hay horarios disponibles por ahora. Vuelve a revisar más tarde.', mostrarTrabajador: true
+  }
 };
 
 function el(tag, clase, texto) { const n = document.createElement(tag); if (clase) n.className = clase; if (texto != null) n.textContent = texto; return n; }
 const hhmm = t => String(t).slice(0, 5);
-const dia = f => { const [y, m, d] = String(f).slice(0, 10).split('-').map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' }); };
+const dia = f => {
+  const [y, m, d] = String(f).slice(0, 10).split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' });
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   const rol = document.body.dataset.rol, conf = ROLES[rol], u = Sesion.usuario();

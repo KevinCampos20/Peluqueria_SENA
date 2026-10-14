@@ -3,8 +3,7 @@ const CRutas = require('../../controlador/admin/CrearClienteControlador');
 const TRutas = require('../../controlador/admin/CrearTrabajadorControlador');
 const ARutas = require('../../controlador/admin/CrearAdminControlador');
 const LRutas = require('../../controlador/admin/LoginAdminControlador');
-
-
+const CHRutas = require('../../controlador/admin/ConsultarHorariosTrabajadorControlador');
 const ETRutas = require('../../controlador/admin/EliminarTrabajadorAdminControlador');
 const ECRutas = require('../../controlador/admin/EliminarClienteAdminControlador');
 const MCRutas = require('../../controlador/admin/DesactivarClienteControlador');
@@ -20,9 +19,8 @@ const router = express.Router();
 router.post('/seguridad/crearcliente', CRutas.crearCliente);//RF01
 router.post('/seguridad/creartrabajador', TRutas.crearTrabajador);//RF04
 router.post('/seguridad/crearadmin', ARutas.crearAdmin);
-router.get('/seguridad/login', LRutas.validarCredencial);
-
-
+router.post('/seguridad/login', LRutas.validarCredencial);
+router.get('/seguridad/horarios/:idtrabajador', CHRutas.consultarHorariosTrabajador); // RF07
 router.delete('/seguridad/trabajadores/:idtrabajador', ETRutas.eliminarTrabajador);//RF13
 router.delete('/seguridad/clientes/:idcliente', ECRutas.eliminarCliente);//RF14
 router.put('/seguridad/desactivarcliente/:id', MCRutas.modificarestado);
