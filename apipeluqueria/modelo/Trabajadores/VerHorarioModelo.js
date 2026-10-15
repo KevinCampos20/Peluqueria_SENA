@@ -56,10 +56,10 @@ class VerHorarioModelo {
         }
     }
      static async buscarTodo(id, pag = 1, limit = 50) {
-        const paginaActual = Math.max(1, parseInt(pag));
-        const rPagina = Math.max(1, parseInt(limit));
-        const op = (paginaActual -1) * rPagina;
-        const fecha = fechaConsulta || new Date().toISOString().split('T')[0];
+        const paginaActual = Math.max(1, parseInt(pag) || 1);
+        const rPagina = Math.max(1, parseInt(limit) || 50);
+        const offset = (paginaActual - 1) * rPagina;
+        
         const query = `
         SELECT 
             t.nombres AS nombresTrabajador,
@@ -68,16 +68,18 @@ class VerHorarioModelo {
             h.horaFinal,
             rh.estado AS estadoRegistro
         FROM reghorarios rh
-        INNER JOIN trabajadores t ON rh.idTrabajador = t.idTrabajador
-        INNER JOIN horarios h ON rh.idHorario = h.idHorario
-        WHERE idTrabajador=?
+        INNER JOIN trabajadores t 
+            ON rh.idTrabajador = t.idTrabajador
+        INNER JOIN horarios h 
+            ON rh.idHorario = h.idHorario
+        WHERE rh.idTrabajador = ?
         LIMIT ? OFFSET ?
        `;
         try {
-            const resultado = await dbService.query(query, [limit, pag, id]);
+            const resultado = await dbService.query(query, [id, rPagina, offset]);
             return resultado.length > 0 ? resultado : [];
         } catch (err) {
-            throw new Error(`Error al buscar el horario por estado: ${err.message}`);
+            throw new Error(`Error al buscar todos los horarios: ${err.message}`);
         }
     }
 }
