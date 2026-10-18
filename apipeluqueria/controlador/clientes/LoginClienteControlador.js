@@ -1,9 +1,7 @@
 /*
 Este es rf-03 login cliente funcion validarCredencial
 */
-
 const modelo = require('../../modelo/clientes/LoginClienteModelo');
-
 
 class LoginClienteControlador {
   // Validar correo y contraseña
@@ -21,13 +19,7 @@ class LoginClienteControlador {
         return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
       }
 
-      if (user.estado !== 'Activo') {
-        return res.status(403).json({ error: 'La cuenta está inactiva. Comuníquese con el administrador.' });
-      }
-
-      const { contrasena, ...usuarioSinClave } = user;
-      res.json({ mensaje: 'Inicio de sesión exitoso', usuario: usuarioSinClave });
-      
+      res.json({ mensaje: 'Inicio de sesión exitoso', usuario: user });
     } catch (err) {
       res.status(500).json({ error: `Hubo un error al validar las credenciales: ${err.message}` });
     }

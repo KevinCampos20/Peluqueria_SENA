@@ -2,7 +2,6 @@
 const dbService = require('../bd/Conexion');
 const bcrypt = require('bcrypt');
 
-
 class LoginClienteModelo {
   // Buscar usuario por correo
   static async buscaCorreo(email) {
