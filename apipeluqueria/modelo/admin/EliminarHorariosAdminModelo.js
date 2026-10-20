@@ -6,9 +6,9 @@ class EliminarHorariosAdminModelo {
     static async buscarPorId(idhorario) {
 
         const query = `
-            SELECT idhorario, idtrabajador, fecha, horaInicio, horaFin, estado
+            SELECT idHorario, fecha, horaInicio, horaFinal, estado
             FROM horarios
-            WHERE idhorario = ?
+            WHERE idHorario = ?
         `;
 
         try {
@@ -25,23 +25,27 @@ class EliminarHorariosAdminModelo {
         const query = `
             SELECT COUNT(*) AS total
             FROM citas
-            WHERE idhorario = ?
+            WHERE idHorario = ?
         `;
 
         try {
             const resultado = await dbService.query(query, [idhorario]);
             return resultado[0].total;
         } catch (err) {
+            // bdpeluqueria.sql todavía no trae la tabla citas: sin tabla no hay citas que impidan eliminar
+            if (err.code === 'ER_NO_SUCH_TABLE') {
+                return 0;
+            }
             throw new Error(`Error al consultar las citas del horario: ${err.message}`);
         }
     }
 
-    // Elimina el horario
+    // Elimina el horario (reghorarios se borra sola por el ON DELETE CASCADE)
     static async eliminarHorario(idhorario) {
 
         const query = `
             DELETE FROM horarios
-            WHERE idhorario = ?
+            WHERE idHorario = ?
         `;
 
         try {

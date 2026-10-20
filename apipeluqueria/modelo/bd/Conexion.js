@@ -25,6 +25,25 @@ class Conexion {
         throw err;  // Vuelve a lanzar el error para ser manejado fuera
       });
   }
+
+  // Ejecuta varias consultas como una sola transacción: o se guardan todas o no se guarda ninguna.
+  // Uso: await dbService.transaccion(async (q) => { await q('UPDATE ...', [..]); });
+  async transaccion(trabajo) {
+    const conexion = await this.pool.promise().getConnection();
+
+    try {
+      await conexion.beginTransaction();
+      const resultado = await trabajo((sql, params) => conexion.query(sql, params).then(([r]) => r));
+      await conexion.commit();
+      return resultado;
+    } catch (err) {
+      await conexion.rollback();
+      console.error('❌ Error durante la transacción:', err.message);
+      throw err;
+    } finally {
+      conexion.release();
+    }
+  }
 }
 
 module.exports = new Conexion();  // Exporta una instancia única de la clase

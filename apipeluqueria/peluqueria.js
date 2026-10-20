@@ -5,6 +5,7 @@ const cors = require('cors');
 const rutaadmin = require('./vista/admin/RutasAdmin');
 const rutacliente = require('./vista/clientes/RutasClientes');
 const rutatrabajador = require('./vista/trabajadores/RutasTrabajadores');
+const rutacitas = require('./vista/clientes/RutasCitas');
 
 // const rutaAdmin = require('./vista/AdminRutas');
 
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/', rutaadmin);
 app.use('/', rutacliente);   
 app.use('/', rutatrabajador);
+app.use('/', rutacitas);
 
 // app.use('/seguridad', rutaAdmin);
 
