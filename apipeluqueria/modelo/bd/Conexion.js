@@ -1,44 +1,75 @@
+
 const mysql = require('mysql2');
 const dbConfig = require('./Config');
 
 class Conexion {
   constructor() {
-    this.pool = mysql.createPool(dbConfig); // Crea un pool de conexiones
+    this.pool = mysql.createPool(dbConfig);
 
-    // Verifica la conexión en el inicio
+    // Verifica la conexión al iniciar.
     this.pool.getConnection((err, connection) => {
       if (err) {
-        console.error('❌ Error al conectar a la base de datos:', err.message);
-      } else {
-        console.log('✅ Conectado a la base de datos');
-        connection.release();  // Libera la conexión al pool
+        console.error(
+          'Error al conectar a la base de datos:',
+          err.message
+        );
+        return;
       }
+
+      console.log('✅ Conectado a la base de datos');
+      connection.release();
     });
   }
 
-  // Utiliza promise() para convertir la consulta en una promesa
-  query(queryString, params) {
-    return this.pool.promise().query(queryString, params)
-      .then(([results]) => results)  // Obtiene solo los resultados (sin metadatos)
-      .catch(err => {
-        console.error('❌ Error durante la consulta:', err.message);
-        throw err;  // Vuelve a lanzar el error para ser manejado fuera
-      });
+  // Ejecuta consultas individuales.
+  async query(queryString, params = []) {
+    try {
+      const [results] = await this.pool
+        .promise()
+        .query(queryString, params);
+
+      return results;
+    } catch (err) {
+      console.error('Error durante la consulta:', err.message);
+      throw err;
+    }
   }
 
-  // Ejecuta varias consultas como una sola transacción: o se guardan todas o no se guarda ninguna.
-  // Uso: await dbService.transaccion(async (q) => { await q('UPDATE ...', [..]); });
+  // Ejecuta varias consultas en una única transacción.
   async transaccion(trabajo) {
     const conexion = await this.pool.promise().getConnection();
+    let transaccionIniciada = false;
 
     try {
       await conexion.beginTransaction();
-      const resultado = await trabajo((sql, params) => conexion.query(sql, params).then(([r]) => r));
+      transaccionIniciada = true;
+
+      const resultado = await trabajo(async (sql, params = []) => {
+        const [resultados] = await conexion.query(sql, params);
+        return resultados;
+      });
+
       await conexion.commit();
+      transaccionIniciada = false;
+
       return resultado;
     } catch (err) {
-      await conexion.rollback();
-      console.error('❌ Error durante la transacción:', err.message);
+      if (transaccionIniciada) {
+        try {
+          await conexion.rollback();
+        } catch (errorRollback) {
+          console.error(
+            'Error durante el rollback:',
+            errorRollback.message
+          );
+        }
+      }
+
+      console.error(
+        'Error durante la transacción:',
+        err.message
+      );
+
       throw err;
     } finally {
       conexion.release();
@@ -46,4 +77,4 @@ class Conexion {
   }
 }
 
-module.exports = new Conexion();  // Exporta una instancia única de la clase
+module.exports = new Conexion();

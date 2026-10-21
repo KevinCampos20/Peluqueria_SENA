@@ -1,5 +1,5 @@
 // Utilidades compartidas: API, sesión y guardas de rol
-const API = 'http://localhost:5020'; // Único lugar donde se define la URL del backend
+const API = 'http://localhost:3333'; // Único lugar donde se define la URL del backend
 const CLAVE = 'usuarioPeluqueria';
 
 const Sesion = {

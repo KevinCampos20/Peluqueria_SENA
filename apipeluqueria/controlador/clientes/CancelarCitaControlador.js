@@ -1,77 +1,161 @@
+
 /*
 RF-15.1: El cliente cancela una cita.
-PUT /citas/:idcita/cancelar   body: { idcliente }
+PUT /citas/:idcita/cancelar
+Body: { idcliente }
 */
+
 const modelo = require('../../modelo/clientes/CancelarCitaModelo');
-// Se reutiliza la conversión de horas del RF-09
 const Horas = require('../trabajadores/EditarHorarioControlador');
 
-const HORAS_MINIMAS = 1; // anticipación mínima para cancelar o reprogramar
+const HORAS_MINIMAS = 1;
+
+function idValido(valor) {
+    return /^\d+$/.test(String(valor ?? '')) &&
+        Number.isSafeInteger(Number(valor)) &&
+        Number(valor) > 0;
+}
 
 class CancelarCitaControlador {
 
     static async cancelarCita(req, res) {
-
         const { idcita } = req.params;
         const { idcliente } = req.body || {};
 
-        // 1. Los ids deben ser numéricos
-        if (!/^\d+$/.test(idcita)) {
-            return res.status(400).json({ error: 'El id de la cita no es válido.' });
+        if (!idValido(idcita)) {
+            return res.status(400).json({
+                correcto: false,
+                error: 'El id de la cita no es válido.'
+            });
         }
 
-        if (!/^\d+$/.test(String(idcliente ?? ''))) {
-            return res.status(400).json({ error: 'El id del cliente es obligatorio y debe ser numérico.' });
+        if (!idValido(idcliente)) {
+            return res.status(400).json({
+                correcto: false,
+                error: 'El id del cliente es obligatorio y debe ser numérico.'
+            });
         }
 
         try {
-            // 2. La cita debe existir
-            const cita = await modelo.buscarCita(idcita);
+            const cita = await modelo.buscarCita(Number(idcita));
 
             if (!cita) {
-                return res.status(404).json({ error: 'La cita no existe.' });
-            }
-
-            // 3. El cliente solo cancela sus propias citas
-            if (String(cita.idCliente) !== String(idcliente)) {
-                return res.status(403).json({ error: 'No tiene permisos para cancelar esta cita.' });
-            }
-
-            // 4. Solo se cancelan citas activas
-            if (cita.estado !== 'Activa') {
-                return res.status(409).json({ error: 'Solo se pueden cancelar citas activas.' });
-            }
-
-            // 5. Debe haber al menos 2 horas de anticipación
-            if (CancelarCitaControlador.faltaPoco(cita.fecha, cita.horaInicio)) {
-                return res.status(409).json({
-                    error: `No se puede cancelar con menos de ${HORAS_MINIMAS} horas de anticipación. Comuníquese con la administración.`
+                return res.status(404).json({
+                    correcto: false,
+                    error: 'La cita no existe.'
                 });
             }
 
-            // 6. Cancelar y liberar el horario
-            await modelo.cancelarCita(idcita);
+            if (String(cita.idCliente) !== String(idcliente)) {
+                return res.status(403).json({
+                    correcto: false,
+                    error: 'No tiene permisos para cancelar esta cita.'
+                });
+            }
 
-            return res.json({ mensaje: 'Cita cancelada correctamente. El horario quedó disponible.' });
+            if (cita.estado !== 'Activa') {
+                return res.status(409).json({
+                    correcto: false,
+                    error: 'Solo se pueden cancelar citas activas.'
+                });
+            }
+
+            // La anticipación debe calcularse correctamente.
+            const faltaPoco = CancelarCitaControlador.faltaPoco(
+                cita.fecha,
+                cita.horaInicio
+            );
+
+            if (faltaPoco === null) {
+                return res.status(400).json({
+                    correcto: false,
+                    error: 'No se pudo interpretar la fecha u hora de la cita.'
+                });
+            }
+
+            if (faltaPoco) {
+                return res.status(409).json({
+                    correcto: false,
+                    error: `No se puede cancelar con menos de ${HORAS_MINIMAS} hora de anticipación. Comuníquese con la administración.`
+                });
+            }
+
+            await modelo.cancelarCita(Number(idcita));
+
+            return res.status(200).json({
+                correcto: true,
+                mensaje: 'Cita cancelada correctamente.'
+            });
 
         } catch (err) {
-            console.error(err.message);
-            return res.status(500).json({ error: 'No fue posible cancelar la cita. Intente nuevamente.' });
+            console.error('Error al cancelar la cita:', err.message);
+
+            if (err.codigo === 'CITA_NO_ENCONTRADA') {
+                return res.status(404).json({
+                    correcto: false,
+                    error: err.message
+                });
+            }
+
+            if (
+                err.codigo === 'CITA_NO_ACTIVA' ||
+                err.codigo === 'CITA_NO_ACTUALIZADA'
+            ) {
+                return res.status(409).json({
+                    correcto: false,
+                    error: err.message
+                });
+            }
+
+            return res.status(500).json({
+                correcto: false,
+                error: 'No fue posible cancelar la cita. Intente nuevamente.'
+            });
         }
     }
 
-    // true si la hora de inicio ya pasó o falta menos de HORAS_MINIMAS
+    // true: falta menos de una hora o la cita ya pasó.
+    // false: falta una hora o más.
+    // null: fecha u hora inválida.
     static faltaPoco(fecha, horaInicio) {
         const minutos = Horas.aMinutos(horaInicio);
 
-        if (minutos === null) {
-            return false;
+        if (minutos === null || minutos === undefined) {
+            return null;
         }
 
-        const [anio, mes, dia] = String(fecha).split('-').map(Number);
-        const inicio = new Date(anio, mes - 1, dia, Math.floor(minutos / 60), minutos % 60);
+        const coincidencia = /^(\d{4})-(\d{2})-(\d{2})$/.exec(
+            String(fecha).slice(0, 10)
+        );
 
-        return inicio.getTime() - Date.now() < HORAS_MINIMAS * 60 * 60 * 1000;
+        if (!coincidencia) {
+            return null;
+        }
+
+        const anio = Number(coincidencia[1]);
+        const mes = Number(coincidencia[2]);
+        const dia = Number(coincidencia[3]);
+
+        const inicio = new Date(
+            anio,
+            mes - 1,
+            dia,
+            Math.floor(minutos / 60),
+            minutos % 60
+        );
+
+        // Evita aceptar fechas que JavaScript haya normalizado.
+        if (
+            inicio.getFullYear() !== anio ||
+            inicio.getMonth() !== mes - 1 ||
+            inicio.getDate() !== dia ||
+            !Number.isFinite(inicio.getTime())
+        ) {
+            return null;
+        }
+
+        return inicio.getTime() - Date.now() <
+            HORAS_MINIMAS * 60 * 60 * 1000;
     }
 }
 

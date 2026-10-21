@@ -42,6 +42,13 @@ class EditarHorariosAdminControlador {
             return res.status(400).json({ error: 'La hora de inicio debe ser anterior a la hora final.' });
         }
 
+        // 5.1 Jornada de la peluquería y almuerzo (misma regla que el trabajador)
+        const errorJornada = Horas.validarJornada(inicio, final);
+
+        if (errorJornada) {
+            return res.status(400).json({ error: errorJornada });
+        }
+
         // 6. El estado es opcional; si viene debe ser Activo o Inactivo
         let estadoNuevo = null;
 
