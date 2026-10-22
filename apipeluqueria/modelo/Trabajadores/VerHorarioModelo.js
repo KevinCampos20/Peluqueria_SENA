@@ -1,11 +1,11 @@
 //const dbService = require('../db/clientes/LoginClienteModelo/Conexion');
-const dbService = require('../bd/Conexion');
+const dbService = require("../bd/Conexion");
 
 class VerHorarioModelo {
-    // Buscar todo
-    static async buscaTodoDia(idTrabajador, fechaConsulta = null) {
-        const fecha = fechaConsulta || new Date().toISOString().split('T')[0];
-        const query = `
+  // Buscar todo
+  static async buscaTodoDia(idTrabajador, fechaConsulta = null) {
+    const fecha = fechaConsulta || new Date().toISOString().split("T")[0];
+    const query = `
         SELECT 
             t.nombres AS nombresTrabajador,
             h.fecha,
@@ -18,23 +18,22 @@ class VerHorarioModelo {
         WHERE h.fecha = ? 
           AND rh.idTrabajador = ?
        `;
-        try {
-            const resultado = await dbService.query(query, [fecha, idTrabajador]);
-            return resultado.length > 0 ? resultado : [];
-        } catch (err) {
-            throw new Error(`Error al buscar el horario: ${err.message}`);
-        }
+    try {
+      const resultado = await dbService.query(query, [fecha, idTrabajador]);
+      return resultado.length > 0 ? resultado : [];
+    } catch (err) {
+      throw new Error(`Error al buscar el horario: ${err.message}`);
     }
+  }
 
-    static async buscarEstado(idTrabajador, fechaConsulta = null, est) {
-        const fecha = fechaConsulta || new Date().toISOString().split('T')[0];
-        if (est == 'A') {
-            est = 'Activo';
-        }
-        else {
-            est = 'Inactivo';
-        }
-        const query = `
+  static async buscarEstado(idTrabajador, fechaConsulta = null, est) {
+    const fecha = fechaConsulta || new Date().toISOString().split("T")[0];
+    if (est == "A") {
+      est = "Activo";
+    } else {
+      est = "Inactivo";
+    }
+    const query = `
         SELECT 
             t.nombres AS nombresTrabajador,
             h.fecha,
@@ -48,19 +47,23 @@ class VerHorarioModelo {
           AND rh.idTrabajador = ?
           AND rh.estado
        `;
-        try {
-            const resultado = await dbService.query(query, [fecha, idTrabajador, est]);
-            return resultado.length > 0 ? resultado : [];
-        } catch (err) {
-            throw new Error(`Error al buscar el horario por estado: ${err.message}`);
-        }
+    try {
+      const resultado = await dbService.query(query, [
+        fecha,
+        idTrabajador,
+        est,
+      ]);
+      return resultado.length > 0 ? resultado : [];
+    } catch (err) {
+      throw new Error(`Error al buscar el horario por estado: ${err.message}`);
     }
-     static async buscarTodo(id, pag = 1, limit = 50) {
-        const paginaActual = Math.max(1, parseInt(pag) || 1);
-        const rPagina = Math.max(1, parseInt(limit) || 50);
-        const offset = (paginaActual - 1) * rPagina;
-        
-        const query = `
+  }
+  static async buscarTodo(id, pag = 1, limit = 50) {
+    const paginaActual = Math.max(1, parseInt(pag) || 1);
+    const rPagina = Math.max(1, parseInt(limit) || 50);
+    const offset = (paginaActual - 1) * rPagina;
+
+    const query = `
         SELECT 
             t.nombres AS nombresTrabajador,
             h.fecha,
@@ -75,13 +78,13 @@ class VerHorarioModelo {
         WHERE rh.idTrabajador = ?
         LIMIT ? OFFSET ?
        `;
-        try {
-            const resultado = await dbService.query(query, [id, rPagina, offset]);
-            return resultado.length > 0 ? resultado : [];
-        } catch (err) {
-            throw new Error(`Error al buscar todos los horarios: ${err.message}`);
-        }
+    try {
+      const resultado = await dbService.query(query, [id, rPagina, offset]);
+      return resultado.length > 0 ? resultado : [];
+    } catch (err) {
+      throw new Error(`Error al buscar todos los horarios: ${err.message}`);
     }
+  }
 }
 
 module.exports = VerHorarioModelo;

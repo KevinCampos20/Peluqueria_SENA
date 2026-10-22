@@ -1,6 +1,5 @@
-
-const mysql = require('mysql2');
-const dbConfig = require('./Config');
+const mysql = require("mysql2");
+const dbConfig = require("./Config");
 
 class Conexion {
   constructor() {
@@ -9,14 +8,11 @@ class Conexion {
     // Verifica la conexión al iniciar.
     this.pool.getConnection((err, connection) => {
       if (err) {
-        console.error(
-          'Error al conectar a la base de datos:',
-          err.message
-        );
+        console.error("Error al conectar a la base de datos:", err.message);
         return;
       }
 
-      console.log('✅ Conectado a la base de datos');
+      console.log("✅ Conectado a la base de datos");
       connection.release();
     });
   }
@@ -24,13 +20,11 @@ class Conexion {
   // Ejecuta consultas individuales.
   async query(queryString, params = []) {
     try {
-      const [results] = await this.pool
-        .promise()
-        .query(queryString, params);
+      const [results] = await this.pool.promise().query(queryString, params);
 
       return results;
     } catch (err) {
-      console.error('Error durante la consulta:', err.message);
+      console.error("Error durante la consulta:", err.message);
       throw err;
     }
   }
@@ -58,17 +52,11 @@ class Conexion {
         try {
           await conexion.rollback();
         } catch (errorRollback) {
-          console.error(
-            'Error durante el rollback:',
-            errorRollback.message
-          );
+          console.error("Error durante el rollback:", errorRollback.message);
         }
       }
 
-      console.error(
-        'Error durante la transacción:',
-        err.message
-      );
+      console.error("Error durante la transacción:", err.message);
 
       throw err;
     } finally {

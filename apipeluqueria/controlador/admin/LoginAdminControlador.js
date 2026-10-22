@@ -1,8 +1,7 @@
 /*
 Este es rf-03 login admin funcion validarCredencial
 */
-const modelo = require('../../modelo/admin/LoginAdminModelo');
-
+const modelo = require("../../modelo/admin/LoginAdminModelo");
 
 class LoginAdminControlador {
   // Validar correo y contraseña
@@ -10,29 +9,45 @@ class LoginAdminControlador {
     const { t1: email, t2: password } = req.body; // Renombramos t1 y t2 para mayor claridad
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Correo y contraseña son obligatorios' });
+      return res
+        .status(400)
+        .json({ error: "Correo y contraseña son obligatorios" });
     }
 
     try {
       const user = await modelo.validarCredenciales(email, password);
-      
+
       if (!user) {
-        return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
+        return res
+          .status(401)
+          .json({ error: "Correo o contraseña incorrectos" });
       }
 
-      if (user.estado !== 'Activo') {
-        return res.status(403).json({ error: 'La cuenta está inactiva. Comuníquese con el administrador.' });
+      if (user.estado !== "Activo") {
+        return res
+          .status(403)
+          .json({
+            error: "La cuenta está inactiva. Comuníquese con el administrador.",
+          });
       }
 
-      if (user.rol !== 'admin') {
-      return res.status(403).json({ error: 'No tienes permisos de administrador' });
+      if (user.rol !== "admin") {
+        return res
+          .status(403)
+          .json({ error: "No tienes permisos de administrador" });
       }
 
       const { contrasena, ...usuarioSinClave } = user;
-      res.json({ mensaje: 'Inicio de sesión exitoso', usuario: usuarioSinClave });
-
+      res.json({
+        mensaje: "Inicio de sesión exitoso",
+        usuario: usuarioSinClave,
+      });
     } catch (err) {
-      res.status(500).json({ error: `Hubo un error al validar las credenciales: ${err.message}` });
+      res
+        .status(500)
+        .json({
+          error: `Hubo un error al validar las credenciales: ${err.message}`,
+        });
     }
   }
 }

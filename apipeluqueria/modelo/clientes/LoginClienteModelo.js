@@ -1,11 +1,11 @@
 //const dbService = require('../../clientes/Conexion');
-const dbService = require('../bd/Conexion');
-const bcrypt = require('bcrypt');
+const dbService = require("../bd/Conexion");
+const bcrypt = require("bcrypt");
 
 class LoginClienteModelo {
   // Buscar usuario por correo
   static async buscaCorreo(email) {
-const query = 'SELECT * FROM clientes WHERE correo = ?';
+    const query = "SELECT * FROM clientes WHERE correo = ?";
     try {
       const result = await dbService.query(query, [email]);
       return result.length ? result[0] : null;
@@ -17,7 +17,7 @@ const query = 'SELECT * FROM clientes WHERE correo = ?';
   // Validar correo y contraseña
   static async validarCredenciales(email, password) {
     if (!email || !password) {
-      throw new Error('Correo y contraseña son obligatorios');
+      throw new Error("Correo y contraseña son obligatorios");
     }
 
     try {

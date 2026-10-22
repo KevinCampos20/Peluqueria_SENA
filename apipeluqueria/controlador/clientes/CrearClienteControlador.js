@@ -1,13 +1,30 @@
-const modelo = require('../../modelo/admin/CrearClienteModelo');
-const bcrypt = require('bcrypt');
-class CrearClienteControlador {     // funcion crear nuevo cliente
+const modelo = require("../../modelo/admin/CrearClienteModelo");
+const bcrypt = require("bcrypt");
+class CrearClienteControlador {
+  // funcion crear nuevo cliente
 
   static async crearCliente(req, res) {
-    const { t1: tipoD, t2: numeroD, t3: nom, t4: dir, t5: tel, t6: email, t7: contras } = req.body;
+    const {
+      t1: tipoD,
+      t2: numeroD,
+      t3: nom,
+      t4: dir,
+      t5: tel,
+      t6: email,
+      t7: contras,
+    } = req.body;
 
     // ---------------👁️‍🗨️ validaciones 👁️‍🗨️---------------
     // Validar campos vacíos❓❓❓❓❓----------------
-    const errorCampos = CrearClienteControlador.verCampos(tipoD, numeroD, nom, dir, tel, email, contras);
+    const errorCampos = CrearClienteControlador.verCampos(
+      tipoD,
+      numeroD,
+      nom,
+      dir,
+      tel,
+      email,
+      contras,
+    );
     if (errorCampos) {
       return res.status(400).json({ error: errorCampos });
     }
@@ -48,37 +65,48 @@ class CrearClienteControlador {     // funcion crear nuevo cliente
     }
 
     try {
-      const result = await modelo.crearClientes(tipoD, numeroD, nom, dir, tel, email, contras);
-      res.status(201).json({ mensaje: 'Cliente creado con exito', id: result.insertId });
+      const result = await modelo.crearClientes(
+        tipoD,
+        numeroD,
+        nom,
+        dir,
+        tel,
+        email,
+        contras,
+      );
+      res
+        .status(201)
+        .json({ mensaje: "Cliente creado con exito", id: result.insertId });
     } catch (err) {
       if (err.message.includes("Duplicate entry")) {
         return res.status(409).json({
-          error: 'Ya existe un usuario con estos datos.',
-          sugerencia: 'intenta recuperar la cuenta o inicia sesión.'
+          error: "Ya existe un usuario con estos datos.",
+          sugerencia: "intenta recuperar la cuenta o inicia sesión.",
         });
       } else {
-        return res.status(500).json({ error: 'Error inesperado: ' + err.message });
+        return res
+          .status(500)
+          .json({ error: "Error inesperado: " + err.message });
       }
     }
     // ------------👁️‍🗨️ fin validaciones👁️‍🗨️------------
-
-  }//cerrar crearcliente------------------------------
+  } //cerrar crearcliente------------------------------
   //👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊
   //-------------------validaciones-----------------------------
   //👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊👊
 
   static verCampos(tipoD, numeroD, nom, dir, tel, email, contras) {
     if (!tipoD || !numeroD || !nom || !dir || !tel || !email || !contras) {
-      return 'Todos los campos son obligatorios.';
+      return "Todos los campos son obligatorios.";
     }
     return null; // no encontro campos vacios
-  }//cerrar verCampos
+  } //cerrar verCampos
 
   //verificar nombres completos
   static vertipoD(tipoD) {
     const tip = /^[A-Z\s]{2,3}$/;
     if (!tip.test(tipoD)) {
-      return 'tipo de documento invalidos minimo 2 caracteres o maximo 3  CC, TI, CE';
+      return "tipo de documento invalidos minimo 2 caracteres o maximo 3  CC, TI, CE";
     } else {
       return null;
     }
@@ -86,7 +114,7 @@ class CrearClienteControlador {     // funcion crear nuevo cliente
   //validar documento
   static verIde(numeroD) {
     if (!/^\d{8,10}$/.test(numeroD)) {
-      return 'La identificación debe tener entre 8 y 10 dígitos numéricos.';
+      return "La identificación debe tener entre 8 y 10 dígitos numéricos.";
     } else {
       return null; // Todo bien
     }
@@ -95,7 +123,7 @@ class CrearClienteControlador {     // funcion crear nuevo cliente
   static vernom(nom) {
     const name = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,100}$/;
     if (!name.test(nom)) {
-      return 'Nombres y apellidos invalidos minimo 3 caracteres o maximo 100 solo letras minuscula o ]Mayuscula';
+      return "Nombres y apellidos invalidos minimo 3 caracteres o maximo 100 solo letras minuscula o ]Mayuscula";
     } else {
       return null;
     }
@@ -111,7 +139,7 @@ class CrearClienteControlador {     // funcion crear nuevo cliente
     const dirRegex = /^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s.,#\/ºª\-]{5,200}$/;
 
     if (!dirRegex.test(direccion)) {
-      return 'Dirección inválida. Mínimo 5 caracteres, máximo 200. Solo se permiten letras, números, espacios y caracteres como #, -, ., , , /, º, ª';
+      return "Dirección inválida. Mínimo 5 caracteres, máximo 200. Solo se permiten letras, números, espacios y caracteres como #, -, ., , , /, º, ª";
     } else {
       return null;
     }
@@ -120,7 +148,7 @@ class CrearClienteControlador {     // funcion crear nuevo cliente
   //verificar telefono
   static verTel(tel) {
     if (!/^\d{10}$/.test(tel)) {
-      return 'El teléfono debe tener exactamente 10 dígitos numéricos.';
+      return "El teléfono debe tener exactamente 10 dígitos numéricos.";
     } else {
       return null; // todo bien
     }
@@ -130,17 +158,17 @@ class CrearClienteControlador {     // funcion crear nuevo cliente
   static veremail(email) {
     const er = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!er.test(email) || email.length > 250) {
-      return 'Correo inválido. Ejemplo válido: ejemplo@email.com';
+      return "Correo inválido. Ejemplo válido: ejemplo@email.com";
     } else {
       return null;
     }
-  }//cerrar veremail
+  } //cerrar veremail
 
   //verificar contraseña
   static verkey(contras) {
     const key = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     if (!key.test(contras)) {
-      return 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo especial.';
+      return "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo especial.";
     } else {
       return null;
     }
@@ -152,7 +180,7 @@ class CrearClienteControlador {     // funcion crear nuevo cliente
 
     if (!email || !contras) {
       return res.status(400).json({
-        error: 'El correo y la contraseña son obligatorios.'
+        error: "El correo y la contraseña son obligatorios.",
       });
     }
 
@@ -161,7 +189,7 @@ class CrearClienteControlador {     // funcion crear nuevo cliente
 
       if (resultado.length === 0) {
         return res.status(401).json({
-          error: 'Correo o contraseña incorrectos.'
+          error: "Correo o contraseña incorrectos.",
         });
       }
 
@@ -169,27 +197,26 @@ class CrearClienteControlador {     // funcion crear nuevo cliente
 
       const contraseñaCorrecta = await bcrypt.compare(
         contras,
-        cliente.contrasena
+        cliente.contrasena,
       );
 
       if (!contraseñaCorrecta) {
         return res.status(401).json({
-          error: 'Correo o contraseña incorrectos.'
+          error: "Correo o contraseña incorrectos.",
         });
       }
 
       return res.status(200).json({
-        mensaje: 'Inicio de sesión exitoso',
+        mensaje: "Inicio de sesión exitoso",
         cliente: {
           id: cliente.idcliente,
           nombres: cliente.nombres,
-          correo: cliente.correo
-        }
+          correo: cliente.correo,
+        },
       });
-
     } catch (err) {
       return res.status(500).json({
-        error: 'Error al iniciar sesión: ' + err.message
+        error: "Error al iniciar sesión: " + err.message,
       });
     }
   }
