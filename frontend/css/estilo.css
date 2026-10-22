@@ -32,7 +32,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -107,9 +108,17 @@ input {
   padding: 2rem;
 }
 
+.caja-acceso {
+  width: 100%;
+  max-width: 32rem;
+}
+
 .formulario form {
   width: 100%;
-  max-width: 23rem;
+}
+
+#loginForm {
+  max-width: 26rem;
 }
 
 .formulario h2 {
@@ -132,7 +141,8 @@ input {
   margin-bottom: 0.3rem;
 }
 
-.campo input {
+.campo input:not([type="checkbox"]):not([type="radio"]),
+.campo select {
   width: 100%;
   padding: 0.7rem 0.8rem;
   border: 1px solid var(--linea);
@@ -140,7 +150,8 @@ input {
   background: var(--papel);
 }
 
-.campo input:focus {
+.campo input:focus,
+.campo select:focus {
   border-color: var(--ciruela);
 }
 
@@ -165,7 +176,8 @@ input {
   padding: 0.4rem 0.6rem;
 }
 
-.formulario .btn {
+.formulario form > .btn,
+.form-grid .btn {
   width: 100%;
   margin-top: 0.5rem;
 }
@@ -224,7 +236,7 @@ input {
 }
 
 .agenda {
-  max-width: 52rem;
+  max-width: 56rem;
   margin: 0 auto;
   padding: 2rem clamp(1rem, 4vw, 2rem) 4rem;
 }
@@ -244,7 +256,6 @@ input {
 
 .dia h2 {
   font-size: 1.05rem;
-  text-transform: capitalize;
   padding-bottom: 0.4rem;
   border-bottom: 2px solid var(--ciruela);
   margin-bottom: 0.25rem;
@@ -252,7 +263,7 @@ input {
 
 .turno {
   display: grid;
-  grid-template-columns: 8.5rem 1fr auto;
+  grid-template-columns: 8.5rem 1fr auto auto;
   align-items: center;
   gap: 1rem;
   padding: 0.9rem 0;
@@ -318,8 +329,465 @@ input {
     grid-template-columns: 6.5rem 1fr;
   }
 
-  .turno .estado {
+  .turno .estado,
+  .turno .acciones-fila {
     grid-column: 2;
     justify-self: start;
+  }
+
+}
+
+/* ---------- Extensiones: pestañas, formularios, tarjetas, tablas, modales ---------- */
+.agenda.ancha {
+  max-width: 68rem;
+}
+
+.pestanas {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  border-bottom: 2px solid var(--linea);
+  margin-bottom: 1.5rem;
+}
+
+.pestanas:empty {
+  display: none;
+}
+
+.pestana {
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  background: none;
+  color: var(--suave);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.pestana:hover {
+  color: var(--ciruela);
+}
+
+.pestana[aria-selected="true"] {
+  color: var(--ciruela);
+  border-bottom-color: var(--laton);
+}
+
+.pestanas-acceso {
+  margin-bottom: 1.25rem;
+}
+
+.formulario .registro h2 {
+  font-size: 1.6rem;
+}
+
+.segmentado {
+  display: flex;
+  gap: 0;
+  border: 0;
+  padding: 0;
+  margin: 0 0 1.25rem;
+}
+
+.segmentado legend {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  padding: 0;
+}
+
+.segmentado input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmentado label {
+  flex: 1;
+  text-align: center;
+  padding: 0.55rem 0.4rem;
+  border: 1px solid var(--linea);
+  background: var(--papel);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--suave);
+}
+
+.segmentado label:first-of-type {
+  border-radius: 6px 0 0 6px;
+}
+
+.segmentado label:last-of-type {
+  border-radius: 0 6px 6px 0;
+}
+
+.segmentado input:checked + label {
+  background: var(--ciruela);
+  border-color: var(--ciruela);
+  color: #fff;
+}
+
+.segmentado input:focus-visible + label {
+  outline: 3px solid var(--laton);
+  outline-offset: 2px;
+}
+
+.servidor {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--linea);
+  color: var(--suave);
+}
+
+.servidor summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.servidor .btn {
+  width: auto;
+  margin: 0 0.4rem 0 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1rem;
+}
+
+.form-grid .ancho {
+  grid-column: 1 / -1;
+}
+
+.error-campo {
+  display: block;
+  min-height: 1.1rem;
+  color: var(--err);
+  font-size: 0.82rem;
+  margin-top: 0.2rem;
+}
+
+[aria-invalid="true"] {
+  border-color: var(--err) !important;
+}
+
+.campo.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.7rem;
+}
+
+.campo.check label {
+  margin: 0;
+  font-weight: 500;
+}
+
+.herramientas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.herramientas .campo {
+  margin-bottom: 0;
+}
+
+.herramientas .btn {
+  padding: 0.7rem 1.1rem;
+}
+
+.resumen {
+  color: var(--suave);
+  font-size: 0.92rem;
+  margin-bottom: 1rem;
+}
+
+.ayuda {
+  color: var(--suave);
+  font-size: 0.88rem;
+  margin-bottom: 0.75rem;
+}
+
+.btn.pequeno {
+  padding: 0.35rem 0.8rem;
+  font-size: 0.88rem;
+}
+
+.btn.peligro {
+  background: var(--err);
+}
+
+.btn.peligro:hover {
+  background: #7f1a14;
+}
+
+.btn.sec.peligro {
+  background: transparent;
+  color: var(--err);
+  border-color: var(--err);
+}
+
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.acciones-fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.turno .info {
+  color: var(--suave);
+}
+
+.estado.cancelado {
+  background: #f6dcda;
+  color: var(--err);
+}
+
+.tarjeta {
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.tarjeta h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.9rem;
+}
+
+.zona-peligro {
+  border-color: var(--err);
+}
+
+.zona-peligro p {
+  margin-bottom: 1rem;
+}
+
+.rejilla-2 {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.rejilla-2 .tarjeta {
+  margin-bottom: 0;
+}
+
+.rejilla-2 + .tarjeta {
+  margin-top: 1.25rem;
+}
+
+.rejilla-2 .acciones-fila .btn {
+  margin-top: 0.25rem;
+}
+
+.tabla-caja {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.tabla th,
+.tabla td {
+  text-align: left;
+  padding: 0.6rem 0.6rem;
+  border-bottom: 1px solid var(--linea);
+  vertical-align: middle;
+}
+
+.tabla th {
+  color: var(--suave);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.citas {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.cita {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem 1rem;
+  align-items: start;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-left: 5px solid var(--ok);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+}
+
+.cita.cancelada {
+  border-left-color: var(--err);
+  opacity: 0.85;
+}
+
+.cita-info div {
+  color: var(--suave);
+}
+
+.cita .acciones-fila {
+  grid-column: 1 / -1;
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1.25rem;
+}
+
+.datos dt {
+  font-weight: 600;
+  color: var(--suave);
+}
+
+.datos dd {
+  margin: 0;
+}
+
+.fila-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Modales */
+.modal {
+  width: min(34rem, calc(100% - 2rem));
+  max-height: calc(100vh - 2rem);
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: var(--papel);
+  color: var(--texto);
+  overflow: auto;
+  box-shadow: 0 20px 60px rgba(42, 24, 56, 0.35);
+}
+
+.modal::backdrop {
+  background: rgba(42, 24, 56, 0.55);
+}
+
+.modal-cab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: var(--tinta);
+  color: #fff;
+}
+
+.modal-cab h2 {
+  font-size: 1.1rem;
+}
+
+.cerrar {
+  border: 0;
+  background: none;
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.3rem;
+}
+
+.modal-cuerpo {
+  padding: 1.25rem;
+}
+
+.modal-cuerpo > p {
+  margin-bottom: 1rem;
+}
+
+.modal .acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.lista-modal .dia {
+  margin-bottom: 1rem;
+}
+
+.lista-modal .turno {
+  grid-template-columns: 7rem 1fr auto;
+}
+
+/* Avisos */
+.toasts {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1000;
+  display: grid;
+  gap: 0.5rem;
+  max-width: min(26rem, calc(100% - 2rem));
+}
+
+.toast {
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  background: var(--ok);
+  color: #fff;
+  font-weight: 500;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.toast.error {
+  background: var(--err);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .toast {
+    animation: entra 0.2s ease-out;
+  }
+
+  @keyframes entra {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+}
+
+/* Móvil (va al final para que prevalezca sobre las reglas base anteriores) */
+.rejilla-2 > *,
+.form-grid > * {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .rejilla-2,
+  .form-grid,
+  .fila-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .rejilla-2 .tarjeta {
+    margin-bottom: 1.25rem;
+  }
+
+  .barra {
+    flex-wrap: wrap;
   }
 }
