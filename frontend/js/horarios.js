@@ -29,7 +29,7 @@ function formatoHora(t) {
   const h = Math.floor(n / 60);
   const mm = String(n % 60).padStart(2, "0");
   if (h === 12 && mm === "00") return "12:00 m";
-  return `${h % 12 === 0 ? 12 : h % 12}:${mm} ${h < 12 ? "am" : "pm"}`;
+  return `${h % 12 === 0 ? 12 : h % 12}:${mm} ${h < 12 ? "a. m." : "p. m."}`;
 }
 function formatoDia(f) {
   const [y, m, d] = String(f).slice(0, 10).split("-").map(Number);
@@ -107,7 +107,7 @@ const Horarios = {
 };
 
 /* ---------- Dibujo ---------- */
-function etiquetaEstado(h, textoLibre = "disponible", textoOcupado = "reservado") {
+function etiquetaEstado(h, textoLibre = "disponible", textoOcupado = "no disponible") {
   const libre = Horarios.disponible(h);
   return el("span", "estado " + (libre ? "disponible" : "reservado"), libre ? textoLibre : textoOcupado);
 }

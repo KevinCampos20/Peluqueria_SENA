@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
       { id: "fEstado" },
       el("option", { value: "" }, "Todos"),
       el("option", { value: "activo" }, "Disponibles"),
-      el("option", { value: "inactivo" }, "Reservados / no disponibles"),
+      el("option", { value: "inactivo" }, "No disponibles"),
     );
     const btnAct = el("button", { type: "button", class: "btn sec" }, "Actualizar");
     const resumen = el("p", { class: "resumen", "aria-live": "polite" });
@@ -142,7 +142,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (fFecha.value) l = l.filter((h) => h.fecha === fFecha.value);
       if (fEstado.value) l = l.filter((h) => h.estado.toLowerCase() === fEstado.value);
       const libres = l.filter(Horarios.disponible).length;
-      resumen.textContent = l.length ? `${l.length} horario(s): ${libres} disponible(s) y ${l.length - libres} reservado(s).` : "";
+      resumen.textContent = l.length
+        ? `${l.length} ${l.length === 1 ? "horario" : "horarios"}: ${libres} ${libres === 1 ? "disponible" : "disponibles"} y ${l.length - libres} ${l.length - libres === 1 ? "no disponible" : "no disponibles"}.`
+        : "";
       pintarAgenda(lista, l, {
         vacio: todos.length ? "No hay horarios con ese filtro." : "Aún no hay horarios registrados.",
         trabajador: true,

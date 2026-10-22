@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { id: "fEstado" },
     el("option", { value: "" }, "Todos"),
     el("option", { value: "A" }, "Disponibles"),
-    el("option", { value: "I" }, "Reservados"),
+    el("option", { value: "I" }, "No disponibles"),
   );
   const btnFiltrar = el("button", { type: "submit", class: "btn" }, "Filtrar");
   const btnTodos = el("button", { type: "button", class: "btn sec" }, "Ver todos");
@@ -69,8 +69,9 @@ document.addEventListener("DOMContentLoaded", () => {
     filas = filas.map((h) => ({ ...h, idTrabajador, id: conIds.get(Horarios.clave(h))?.id ?? null }));
 
     const libres = filas.filter(Horarios.disponible).length;
+    const noDisponibles = filas.length - libres;
     resumen.textContent = filas.length
-      ? `${filas.length} horario(s): ${libres} disponible(s) y ${filas.length - libres} reservado(s).`
+      ? `${filas.length} ${filas.length === 1 ? "horario" : "horarios"}: ${libres} ${libres === 1 ? "disponible" : "disponibles"} y ${noDisponibles} ${noDisponibles === 1 ? "no disponible" : "no disponibles"}.`
       : "";
 
     pintarAgenda(lista, filas, {

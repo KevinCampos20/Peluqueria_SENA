@@ -19,8 +19,25 @@ const Config = {
   },
   fijarApi(url) {
     const limpia = String(url || "").trim().replace(/\/+$/, "");
-    if (!limpia || limpia === API_DEFECTO) localStorage.removeItem(CLAVE_API);
-    else localStorage.setItem(CLAVE_API, limpia);
+    if (!limpia) return { ok: false, error: "Escribe la dirección del backend." };
+
+    let direccion;
+    try {
+      direccion = new URL(limpia);
+    } catch {
+      return { ok: false, error: "Escribe una URL válida, por ejemplo: http://localhost:3333." };
+    }
+    if (!["http:", "https:"].includes(direccion.protocol) || direccion.username || direccion.password || direccion.pathname !== "/" || direccion.search || direccion.hash) {
+      return { ok: false, error: "Usa una dirección HTTP o HTTPS sin rutas, parámetros ni credenciales." };
+    }
+
+    try {
+      if (limpia === API_DEFECTO) localStorage.removeItem(CLAVE_API);
+      else localStorage.setItem(CLAVE_API, limpia);
+      return { ok: true };
+    } catch {
+      return { ok: false, error: "No se pudo guardar la dirección en este navegador." };
+    }
   },
 };
 
@@ -225,7 +242,7 @@ function pestanas(barra, contenedor, paneles, inicial) {
   barra.setAttribute("role", "tablist");
   contenedor.setAttribute("role", "tabpanel");
   paneles.forEach((p) => {
-    const b = el("button", { type: "button", role: "tab", id: "tab-" + p.id, class: "pestana" }, p.titulo);
+    const b = el("button", { type: "button", role: "tab", id: "tab-" + p.id, class: "pestana", "aria-controls": contenedor.id }, p.titulo);
     b.addEventListener("click", () => mostrar(p.id));
     b.addEventListener("keydown", (e) => {
       const i = paneles.findIndex((x) => x.id === p.id);
@@ -280,7 +297,7 @@ const CAMPOS_USUARIO = [
     autocomplete: "name",
     maxlength: 100,
     validar: (v) =>
-      /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,100}$/.test(v) ? null : "Solo letras y espacios (mínimo 3 caracteres).",
+      /^[\p{L}\s'-]{3,100}$/u.test(v) ? null : "Usa letras, espacios, apóstrofos o guiones (mínimo 3 caracteres).",
   },
   {
     clave: "t4",
@@ -288,9 +305,9 @@ const CAMPOS_USUARIO = [
     autocomplete: "street-address",
     maxlength: 200,
     validar: (v) =>
-      /^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s.,#/ºª-]{5,200}$/.test(v)
+      /^[\p{L}0-9\s.,#/'ºª-]{5,200}$/u.test(v)
         ? null
-        : "Mínimo 5 caracteres. Solo letras, números y los símbolos . , # - / º ª",
+        : "Escribe una dirección de al menos 5 caracteres. Puedes usar letras, números y signos habituales de dirección.",
   },
   {
     clave: "t5",

@@ -1,89 +1,145 @@
-//const dbService = require('../db/clientes/LoginClienteModelo/Conexion');
 const dbService = require("../bd/Conexion");
 
 class VerHorarioModelo {
-  // Buscar todo
-  static async buscaTodoDia(idTrabajador, fechaConsulta = null) {
-    const fecha = fechaConsulta || new Date().toISOString().split("T")[0];
-    const query = `
-        SELECT 
-            t.nombres AS nombresTrabajador,
-            h.fecha,
-            h.horaInicio,
-            h.horaFinal,
-            rh.estado AS estadoRegistro
-        FROM reghorarios rh
-        INNER JOIN trabajadores t ON rh.idTrabajador = t.idtrabajador
-        INNER JOIN horarios h ON rh.idHorario = h.idHorario
-        WHERE h.fecha = ? 
-          AND rh.idTrabajador = ?
-       `;
-    try {
-      const resultado = await dbService.query(query, [fecha, idTrabajador]);
-      return resultado.length > 0 ? resultado : [];
-    } catch (err) {
-      throw new Error(`Error al buscar el horario: ${err.message}`);
-    }
+  static validarId(id) {
+    return /^\d+$/.test(String(id ?? "")) && Number(id) > 0;
   }
 
-  static async buscarEstado(idTrabajador, fechaConsulta = null, est) {
-    const fecha = fechaConsulta || new Date().toISOString().split("T")[0];
-    if (est == "A") {
-      est = "Activo";
-    } else {
-      est = "Inactivo";
+  static validarFecha(fecha) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(fecha ?? ""))) {
+      return false;
     }
-    const query = `
-        SELECT 
-            t.nombres AS nombresTrabajador,
-            h.fecha,
-            h.horaInicio,
-            h.horaFinal,
-            rh.estado AS estadoRegistro
-        FROM reghorarios rh
-        INNER JOIN trabajadores t ON rh.idTrabajador = t.idtrabajador
-        INNER JOIN horarios h ON rh.idHorario = h.idHorario
-        WHERE h.fecha = ? 
-          AND rh.idTrabajador = ?
-          AND rh.estado
-       `;
-    try {
-      const resultado = await dbService.query(query, [
-        fecha,
-        idTrabajador,
-        est,
-      ]);
-      return resultado.length > 0 ? resultado : [];
-    } catch (err) {
-      throw new Error(`Error al buscar el horario por estado: ${err.message}`);
-    }
+
+    const [anio, mes, dia] = fecha.split("-").map(Number);
+    const fechaUTC = new Date(Date.UTC(anio, mes - 1, dia));
+
+    return (
+      fechaUTC.getUTCFullYear() === anio &&
+      fechaUTC.getUTCMonth() === mes - 1 &&
+      fechaUTC.getUTCDate() === dia
+    );
   }
+
+  static async buscaTodoDia(idTrabajador, fechaConsulta) {
+    if (!this.validarId(idTrabajador)) {
+      throw new Error("El ID del trabajador no es válido.");
+    }
+
+    const fecha = fechaConsulta || new Date().toISOString().slice(0, 10);
+
+    if (!this.validarFecha(fecha)) {
+      throw new Error("La fecha debe tener el formato AAAA-MM-DD.");
+    }
+
+    const query = `
+      SELECT
+        h.idHorario AS idHorario,
+        t.nombres AS nombresTrabajador,
+        h.fecha,
+        h.horaInicio,
+        h.horaFinal,
+        rh.estado AS estadoRegistro
+      FROM reghorarios rh
+      INNER JOIN trabajadores t
+        ON rh.idTrabajador = t.idTrabajador
+      INNER JOIN horarios h
+        ON rh.idHorario = h.idHorario
+      WHERE h.fecha = ?
+        AND rh.idTrabajador = ?
+      ORDER BY h.horaInicio
+    `;
+
+    return dbService.query(query, [fecha, Number(idTrabajador)]);
+  }
+
+  static async buscarEstado(idTrabajador, fechaConsulta, est) {
+    if (!["A", "I"].includes(String(est).toUpperCase())) {
+      throw new Error("El estado solicitado no es válido.");
+    }
+
+    const estado = String(est).toUpperCase() === "A"
+      ? "Activo"
+      : "Inactivo";
+
+    if (!this.validarId(idTrabajador)) {
+      throw new Error("El ID del trabajador no es válido.");
+    }
+
+    const fecha = fechaConsulta || new Date().toISOString().slice(0, 10);
+
+    if (!this.validarFecha(fecha)) {
+      throw new Error("La fecha debe tener el formato AAAA-MM-DD.");
+    }
+
+    const query = `
+      SELECT
+        h.idHorario AS idHorario,
+        t.nombres AS nombresTrabajador,
+        h.fecha,
+        h.horaInicio,
+        h.horaFinal,
+        rh.estado AS estadoRegistro
+      FROM reghorarios rh
+      INNER JOIN trabajadores t
+        ON rh.idTrabajador = t.idTrabajador
+      INNER JOIN horarios h
+        ON rh.idHorario = h.idHorario
+      WHERE h.fecha = ?
+        AND rh.idTrabajador = ?
+        AND rh.estado = ?
+      ORDER BY h.horaInicio
+    `;
+
+    return dbService.query(query, [
+      fecha,
+      Number(idTrabajador),
+      estado,
+    ]);
+  }
+
   static async buscarTodo(id, pag = 1, limit = 50) {
-    const paginaActual = Math.max(1, parseInt(pag) || 1);
-    const rPagina = Math.max(1, parseInt(limit) || 50);
-    const offset = (paginaActual - 1) * rPagina;
+    if (!this.validarId(id)) {
+      throw new Error("El ID del trabajador no es válido.");
+    }
+
+    const pagina = Number(pag);
+    const limite = Number(limit);
+
+    if (
+      !Number.isInteger(pagina) ||
+      pagina < 1 ||
+      !Number.isInteger(limite) ||
+      limite < 1 ||
+      limite > 100
+    ) {
+      throw new Error("Los parámetros de paginación no son válidos.");
+    }
+
+    const offset = (pagina - 1) * limite;
 
     const query = `
-        SELECT 
-            t.nombres AS nombresTrabajador,
-            h.fecha,
-            h.horaInicio,
-            h.horaFinal,
-            rh.estado AS estadoRegistro
-        FROM reghorarios rh
-        INNER JOIN trabajadores t 
-            ON rh.idTrabajador = t.idTrabajador
-        INNER JOIN horarios h 
-            ON rh.idHorario = h.idHorario
-        WHERE rh.idTrabajador = ?
-        LIMIT ? OFFSET ?
-       `;
-    try {
-      const resultado = await dbService.query(query, [id, rPagina, offset]);
-      return resultado.length > 0 ? resultado : [];
-    } catch (err) {
-      throw new Error(`Error al buscar todos los horarios: ${err.message}`);
-    }
+      SELECT
+        h.idHorario AS idHorario,
+        t.nombres AS nombresTrabajador,
+        h.fecha,
+        h.horaInicio,
+        h.horaFinal,
+        rh.estado AS estadoRegistro
+      FROM reghorarios rh
+      INNER JOIN trabajadores t
+        ON rh.idTrabajador = t.idTrabajador
+      INNER JOIN horarios h
+        ON rh.idHorario = h.idHorario
+      WHERE rh.idTrabajador = ?
+      ORDER BY h.fecha, h.horaInicio
+      LIMIT ? OFFSET ?
+    `;
+
+    return dbService.query(query, [
+      Number(id),
+      limite,
+      offset,
+    ]);
   }
 }
 

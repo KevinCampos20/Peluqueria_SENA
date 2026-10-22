@@ -1,35 +1,44 @@
-/*
-Este es rf-03 login cliente funcion validarCredencial
-*/
 const modelo = require("../../modelo/clientes/LoginClienteModelo");
 
 class LoginClienteControlador {
-  // Validar correo y contraseña
   static async validarCredencial(req, res) {
-    const { t1: email, t2: password } = req.body; // Renombramos t1 y t2 para mayor claridad
+    const email = String(req.body?.t1 ?? "").trim().toLowerCase();
+    const password = req.body?.t2;
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ error: "Correo y contraseña son obligatorios" });
+    if (!email || typeof password !== "string" || !password) {
+      return res.status(400).json({
+        error: "Correo y contraseña son obligatorios.",
+      });
     }
 
     try {
-      const user = await modelo.validarCredenciales(email, password);
+      const usuario = await modelo.validarCredenciales(email, password);
 
-      if (!user) {
-        return res
-          .status(401)
-          .json({ error: "Correo o contraseña incorrectos" });
+      if (!usuario) {
+        return res.status(401).json({
+          error: "Correo o contraseña incorrectos.",
+        });
       }
 
-      res.json({ mensaje: "Inicio de sesión exitoso", usuario: user });
-    } catch (err) {
-      res
-        .status(500)
-        .json({
-          error: `Hubo un error al validar las credenciales: ${err.message}`,
+      if (usuario.estado !== "Activo") {
+        return res.status(403).json({
+          error: "La cuenta está inactiva. Comunícate con la administración.",
         });
+      }
+
+      // Nunca enviar la contraseña ni su hash al cliente.
+      const { contrasena, ...usuarioSeguro } = usuario;
+
+      return res.status(200).json({
+        mensaje: "Inicio de sesión exitoso.",
+        usuario: usuarioSeguro,
+      });
+    } catch (err) {
+      console.error("Error en el inicio de sesión del cliente:", err);
+
+      return res.status(500).json({
+        error: "No fue posible iniciar sesión. Intenta nuevamente.",
+      });
     }
   }
 }

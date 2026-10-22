@@ -125,18 +125,43 @@ document.addEventListener("DOMContentLoaded", () => {
   const url = document.getElementById("urlApi");
   const avisoApi = document.getElementById("avisoApi");
   url.value = Config.api();
-  document.getElementById("guardarApi").addEventListener("click", () => {
-    Config.fijarApi(url.value);
+  function guardarDireccionApi() {
+    const resultado = Config.fijarApi(url.value);
+    if (!resultado.ok) {
+      avisoApi.textContent = resultado.error;
+      avisoApi.className = "aviso error";
+      return false;
+    }
     url.value = Config.api();
-    avisoApi.textContent = "Dirección guardada.";
+    return true;
+  }
+
+  document.getElementById("guardarApi").addEventListener("click", () => {
+    if (!guardarDireccionApi()) return;
+    avisoApi.textContent = "Dirección del backend guardada.";
     avisoApi.className = "aviso ok";
   });
-  document.getElementById("probarApi").addEventListener("click", async () => {
-    Config.fijarApi(url.value);
-    avisoApi.textContent = "Probando…";
-    avisoApi.className = "aviso cargando";
-    const r = await api("/");
-    avisoApi.textContent = r.status === 0 ? r.error : `Servidor respondió (${r.status}). Todo listo.`;
-    avisoApi.className = "aviso " + (r.status === 0 ? "error" : "ok");
+
+  document.getElementById("probarApi").addEventListener("click", async (e) => {
+    if (!guardarDireccionApi()) return;
+    const boton = e.currentTarget;
+    await conCarga(boton, async () => {
+      avisoApi.textContent = "Comprobando conexión…";
+      avisoApi.className = "aviso cargando";
+      const r = await api("/");
+      if (r.status === 0) {
+        avisoApi.textContent = r.error;
+        avisoApi.className = "aviso error";
+      } else if (r.ok) {
+        avisoApi.textContent = "Conexión correcta: el servidor respondió correctamente.";
+        avisoApi.className = "aviso ok";
+      } else if (r.status === 404) {
+        avisoApi.textContent = "El servidor está disponible, pero no tiene una ruta configurada en la dirección raíz (/).";
+        avisoApi.className = "aviso";
+      } else {
+        avisoApi.textContent = `El servidor respondió con el código ${r.status}. Revisa la configuración de la API.`;
+        avisoApi.className = "aviso error";
+      }
+    });
   });
 });

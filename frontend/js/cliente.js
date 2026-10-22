@@ -62,14 +62,20 @@ document.addEventListener("DOMContentLoaded", () => {
       lista,
     );
 
+    let versionCarga = 0;
     async function cargar() {
+      const miVersion = ++versionCarga;
       lista.replaceChildren(el("p", "vacio", "Cargando horarios…"));
       try {
-        todos = await Horarios.todos();
+        const resultado = await Horarios.todos();
+        if (miVersion !== versionCarga) return;
+        todos = resultado;
       } catch (e) {
+        if (miVersion !== versionCarga) return;
         lista.replaceChildren(cajaError(e.message, cargar));
         return;
       }
+      if (miVersion !== versionCarga) return;
       const previo = selTrab.value;
       const trabajadores = new Map();
       todos.filter(Horarios.disponible).forEach((h) => trabajadores.set(h.idTrabajador, h.trabajador));
@@ -88,8 +94,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (selTrab.value) l = l.filter((h) => String(h.idTrabajador) === selTrab.value);
       if (fFecha.value) l = l.filter((h) => h.fecha === fFecha.value);
       let vacio = "No hay horarios disponibles por ahora. Vuelve a revisar más tarde.";
-      if (!l.length && pasados && !chkPasados.checked)
-        vacio += ` (Hay ${pasados} horario(s) libre(s) con fecha ya vencida; actívalos con «Mostrar horarios que ya pasaron».)`;
+      if (!l.length && pasados && !chkPasados.checked) {
+        const cantidad = pasados === 1 ? "Hay 1 horario disponible con fecha vencida" : `Hay ${pasados} horarios disponibles con fecha vencida`;
+        vacio += ` ${cantidad}. Puedes mostrarlos con «Mostrar horarios que ya pasaron».`;
+      }
       pintarAgenda(lista, l, {
         vacio,
         trabajador: true,
@@ -120,8 +128,13 @@ document.addEventListener("DOMContentLoaded", () => {
           if (r.status === 409) await cargar(); // el horario ya no estaba libre
           return;
         }
+        const idCita = Number(r.datos.idCita);
+        if (!Number.isInteger(idCita) || idCita < 1) {
+          toast("El servidor confirmó la operación, pero no devolvió un número de cita válido. Actualiza la lista antes de volver a reservar.", "error");
+          return;
+        }
         Citas.agregar({
-          idCita: r.datos.idCita,
+          idCita,
           idHorario: h.id,
           idTrabajador: h.idTrabajador,
           trabajador: h.trabajador,
@@ -147,8 +160,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = el(
       "form",
       { class: "herramientas", novalidate: true },
-      el("div", "campo", el("label", { for: "idCitaNueva" }, "¿Tienes una cita hecha antes? Agrégala con su número"), entrada),
+      el("div", "campo", el("label", { for: "idCitaNueva" }, "Número de una cita existente"), entrada),
       btnAdd,
+      el("p", "ayuda ancho", "Los números añadidos manualmente se guardan solo en este navegador y no se verifican con el servidor."),
     );
     const lista = el("div", { class: "citas" });
     cont.append(form, lista);
@@ -158,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const id = Number(entrada.value);
       if (!Number.isInteger(id) || id < 1) return toast("Escribe un número de cita válido.", "error");
       if (Citas.leer().some((c) => c.idCita === id)) return toast("Esa cita ya está en tu lista.", "error");
-      Citas.agregar({ idCita: id, estado: "Activa" });
+      Citas.agregar({ idCita: id, estado: "Sin verificar" });
       entrada.value = "";
       dibujar();
     });
@@ -167,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const citas = Citas.leer().sort((a, b) => b.idCita - a.idCita);
       if (!citas.length) {
         lista.replaceChildren(
-          el("p", "vacio", "Aún no tienes citas en este navegador. Reserva una en «Horarios disponibles» o agrega una por su número."),
+          el("p", "vacio", "No hay citas guardadas en este navegador. Reserva una desde «Horarios disponibles» o añade el número de una cita existente."),
         );
         return;
       }
@@ -176,9 +190,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function tarjeta(c) {
       const activa = c.estado === "Activa";
+      const sinVerificar = c.estado === "Sin verificar";
       const detalle = c.fecha
         ? el("div", null, `${formatoDia(c.fecha)} · ${formatoHora(c.horaInicio)} a ${formatoHora(c.horaFinal)}`)
-        : el("div", "ayuda", "Sin detalles guardados. Puedes cancelarla o reprogramarla igualmente.");
+        : el("div", "ayuda", sinVerificar ? "No se ha comprobado en el servidor que esta cita exista." : "No hay detalles guardados para esta cita.");
       const acciones = el("div", "acciones-fila");
       if (activa) {
         const rep = el("button", { type: "button", class: "btn sec pequeno" }, "Reprogramar");
@@ -195,9 +210,9 @@ document.addEventListener("DOMContentLoaded", () => {
       acciones.append(quitar);
       return el(
         "article",
-        "cita " + (activa ? "activa" : "cancelada"),
+        "cita " + (activa ? "activa" : c.estado === "Cancelada" ? "cancelada" : "sin-verificar"),
         el("div", "cita-info", el("strong", null, `Cita #${c.idCita}`), detalle, c.trabajador ? el("div", null, `con ${c.trabajador}`) : null),
-        el("span", "estado " + (activa ? "disponible" : "cancelado"), activa ? "Activa" : "Cancelada"),
+        el("span", "estado " + (activa ? "disponible" : c.estado === "Cancelada" ? "cancelado" : "sin-verificar"), activa ? "Activa" : c.estado === "Cancelada" ? "Cancelada" : "Sin verificar"),
         acciones,
       );
     }
@@ -297,7 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     btn.addEventListener("click", async () => {
       const activas = Citas.leer().filter((c) => c.estado === "Activa").length;
-      const extra = activas ? ` Tienes ${activas} cita(s) activa(s) registrada(s) aquí; cancélalas antes si ya no las necesitas.` : "";
+      const extra = activas ? " Si tienes citas activas, comprueba su estado y cancélalas antes si ya no las necesitas." : "";
       const ok = await confirmar("Desactivar cuenta", "¿Seguro que quieres desactivar tu cuenta?" + extra, {
         boton: "Sí, desactivar",
         peligro: true,
